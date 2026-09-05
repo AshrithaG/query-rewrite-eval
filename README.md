@@ -116,6 +116,60 @@ representative and the correlation falls apart again:
 That last row is the honest nuance. Within a training run, ROUGE and retrieval
 do move together. They are also both moving across a range too small to act on.
 
+
+## The retrieval layer, and two things measuring it revealed
+
+The BM25 index here is written rather than imported: numpy postings with a
+per-term offset table, agreeing with a reference implementation on 97% of top-1
+results under matched parameters. It was written by hand for one reason, which
+turned into the first finding.
+
+### Sharding a BM25 index silently changes the answer
+
+BM25 weights a term by how rare it is in the collection. A shard holds a slice,
+so a shard computing IDF from its own documents weights terms by their rarity
+*there*, and the same document scores differently depending on which shard it
+landed on. Nothing raises an error. The results look fine.
+
+Top-10 agreement against a single unsharded index over the same collection:
+
+| shards | global IDF | per-shard IDF | top-1 preserved |
+|---|---|---|---|
+| 2 | 97.1% | 90.6% | 93.6% |
+| 4 | 97.1% | 85.9% | 88.8% |
+| 8 | 96.9% | 83.3% | 86.9% |
+| 16 | 96.8% | 79.6% | 83.9% |
+
+At 16 shards a fifth of the top-10 is wrong and **one query in six gets a
+different top result**, silently. Distributing global document frequencies
+before building any shard holds fidelity flat at ~97% regardless of shard count,
+and costs one pass over the collection. Off-the-shelf BM25 libraries do not
+expose the document frequencies, which is why this index accepts them as input.
+
+### Fan-out made it 25 times slower, and that is the useful number
+
+| documents | build | index size | search p50 |
+|---|---|---|---|
+| 12,353 | 0.1 s | 3 MB | 0.07 ms |
+| 50,000 | 1.2 s | 18 MB | 0.17 ms |
+| 100,000 | 2.5 s | 32 MB | 0.52 ms |
+| 200,000 | 5.4 s | 60 MB | 0.72 ms |
+| 400,000 | 10.8 s | 114 MB | 1.48 ms |
+
+A loopback HTTP round trip costs about 1 ms, so a shard doing less than roughly
+1 ms of work spends more on being called than on searching. At the scale this
+evaluation actually runs, splitting the collection eight ways saves 0.04 ms of
+search and adds about 1 ms of coordination.
+
+Measured rather than predicted: fan-out to eight local processes took p50 at
+concurrency 32 from **21.6 ms to 776 ms**, because eight uvicorn workers and a
+coordinator were competing for the same twelve cores in order to avoid 0.07 ms
+of work.
+
+The crossover is near 400k documents per shard. Below it, distributing this is
+strictly worse, and the correct engineering decision is the one that looks least
+impressive on a diagram.
+
 ## What this means if you are shipping something
 
 **Choosing between approaches on ROUGE will mislead you.** The metric prefers
@@ -157,10 +211,9 @@ own semantics into the outcome, so a rewrite could score well because the encode
 liked it. BM25 is transparent and lexical, so a rewrite that retrieves better did
 so by putting better terms in the query.
 
-Also in this repo: a hand-written sharded BM25 index and the measurement of what
-sharding does to correctness and latency (`results/idf_sharding.md`,
-`results/scaling.md`), and an experiment-design analysis of how much traffic it
-takes to detect these differences online (`results/experiment_design.md`).
+Full detail on the index and sharding work is in `results/idf_sharding.md` and
+`results/scaling.md`, and the experiment-design analysis of how much traffic it
+takes to detect these differences online is in `results/experiment_design.md`.
 
 ## What this is not
 
