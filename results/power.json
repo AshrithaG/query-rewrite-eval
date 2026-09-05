@@ -1,0 +1,148 @@
+{
+  "concat_1": {
+    "paired": {
+      "n_required": 190,
+      "effect": -0.03731417800117207,
+      "sd": 0.18348125667228696,
+      "cohens_d": -0.20336779177296757,
+      "design": "paired A/B"
+    },
+    "unpaired": {
+      "n_required": 1088,
+      "effect": -0.03731417800117215,
+      "sd": 0.3106379697399734,
+      "cohens_d": -0.1201211108622904,
+      "design": "unpaired A/B (total)"
+    },
+    "interleaving": {
+      "n_required": 859,
+      "effect": -0.11169686985172982,
+      "sd": 0.9937969011249228,
+      "cohens_d": -0.1123940613271134,
+      "design": "interleaving"
+    }
+  },
+  "concat_4": {
+    "paired": {
+      "n_required": 2371,
+      "effect": -0.008446917164530486,
+      "sd": 0.14679514661754556,
+      "cohens_d": -0.05754221007413658,
+      "design": "paired A/B"
+    },
+    "unpaired": {
+      "n_required": 18648,
+      "effect": -0.008446917164530499,
+      "sd": 0.29112416570764693,
+      "cohens_d": -0.029014826522553515,
+      "design": "unpaired A/B (total)"
+    },
+    "interleaving": {
+      "n_required": 344,
+      "effect": -0.17066555393281868,
+      "sd": 0.9853804136474352,
+      "cohens_d": -0.17319763166500493,
+      "design": "interleaving"
+    }
+  },
+  "concat_all": {
+    "paired": {
+      "n_required": 985,
+      "effect": -0.01622926640294101,
+      "sd": 0.18172998045468552,
+      "cohens_d": -0.08930428739570456,
+      "design": "paired A/B"
+    },
+    "unpaired": {
+      "n_required": 5092,
+      "effect": -0.016229266402941034,
+      "sd": 0.2922727296046942,
+      "cohens_d": -0.05552781617666315,
+      "design": "unpaired A/B (total)"
+    },
+    "interleaving": {
+      "n_required": 299,
+      "effect": -0.18083588175331294,
+      "sd": 0.9835634179980158,
+      "cohens_d": -0.18385787682241528,
+      "design": "interleaving"
+    }
+  },
+  "first_turn": {
+    "paired": {
+      "n_required": 6073,
+      "effect": -0.012121154628451588,
+      "sd": 0.33715362010707384,
+      "cohens_d": -0.035951429572674116,
+      "design": "paired A/B"
+    },
+    "unpaired": {
+      "n_required": 13064,
+      "effect": -0.012121154628451647,
+      "sd": 0.3496709636940885,
+      "cohens_d": -0.034664458553830345,
+      "design": "unpaired A/B (total)"
+    },
+    "interleaving": {
+      "n_required": 27259,
+      "effect": -0.01954569466455362,
+      "sd": 0.999861784958395,
+      "cohens_d": -0.019548396546995674,
+      "design": "interleaving"
+    }
+  },
+  "gold": {
+    "paired": {
+      "n_required": 60,
+      "effect": 0.11608139089412922,
+      "sd": 0.3194146612578272,
+      "cohens_d": 0.3634191068030841,
+      "design": "paired A/B"
+    },
+    "unpaired": {
+      "n_required": 144,
+      "effect": 0.11608139089412917,
+      "sd": 0.3492124895250038,
+      "cohens_d": 0.33240904714496955,
+      "design": "unpaired A/B (total)"
+    },
+    "interleaving": {
+      "n_required": 77,
+      "effect": 0.3378080544980966,
+      "sd": 0.9412621715158549,
+      "cohens_d": 0.3588883785205921,
+      "design": "interleaving"
+    }
+  },
+  "raw": {
+    "paired": {
+      "n_required": 25,
+      "effect": -0.21791400201915534,
+      "sd": 0.3827100879759615,
+      "cohens_d": -0.5693970680826234,
+      "design": "paired A/B"
+    },
+    "unpaired": {
+      "n_required": 34,
+      "effect": -0.2179140020191554,
+      "sd": 0.31809236509674244,
+      "cohens_d": -0.6850651758110589,
+      "design": "unpaired A/B (total)"
+    },
+    "interleaving": {
+      "n_required": 25,
+      "effect": -0.5598818768456743,
+      "sd": 0.8286177529407774,
+      "cohens_d": -0.6756817300361291,
+      "design": "interleaving"
+    }
+  },
+  "_detectable": {
+    "1000": 0.01300515505120267,
+    "10000": 0.004112591128544415,
+    "100000": 0.0013005155051202667,
+    "1000000": 0.00041125911285444153,
+    "10000000": 0.00013005155051202668
+  },
+  "_baseline_ndcg": 0.38917125888628246
+}

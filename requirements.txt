@@ -1,0 +1,7 @@
+datasets>=2.19
+huggingface_hub>=0.23
+bm25s>=0.2
+PyStemmer>=2.2
+rouge-score>=0.1.2
+numpy>=1.26
+scipy>=1.11
