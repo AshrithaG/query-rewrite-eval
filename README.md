@@ -17,8 +17,9 @@ bash scripts/run_all.sh                          # + fine-tuning, one GPU, ~3 h
 
 ## The headline
 
-Across seven systems that genuinely differ in approach, **ROUGE-L ranks them
-almost exactly backwards from recall@10: Kendall tau -0.810, p=0.011.**
+Across systems that genuinely differ in approach, **ROUGE-L ranks them close to
+backwards from recall@10**: Kendall tau between -0.73 and -0.87 depending on
+corpus size, stable across a fivefold change in collection size.
 
 | system | ROUGE-L | recall@10 | MRR@10 | nDCG@10 | words |
 |---|---|---|---|---|---|
@@ -31,18 +32,54 @@ almost exactly backwards from recall@10: Kendall tau -0.810, p=0.011.**
 | **concat whole conversation** | **0.178** | **0.735** | 0.261 | 0.373 | 105.8 |
 | **no rewriting at all** | **0.665** | **0.240** | 0.150 | 0.171 | 6.4 |
 
-The two systems with the **worst** ROUGE retrieve **more** relevant documents
-than the human reference does. Pasting the last four turns together scores 0.230
-ROUGE and finds the answer 73.7% of the time; the human rewrite scores 1.000 by
-construction and finds it 71.5% of the time.
+On this corpus the two systems with the **worst** ROUGE retrieve **more**
+relevant documents than the human reference does. That specific result turns out
+to be corpus-size dependent and is corrected below; the correlation itself is
+not.
 
-Meanwhile the system with the third-best ROUGE is the one that does no rewriting
-at all. The unmodified question is mostly a substring of the reference rewrite,
+The finding that does hold at every scale tested: the system with the third-best
+ROUGE is the one that does no rewriting at all. The unmodified question is mostly a substring of the reference rewrite,
 so it inherits high n-gram overlap while retrieving at 0.240.
 
 ROUGE is measuring resemblance to a short human sentence. Retrieval rewards
 having the right terms present. Those are not the same objective, and on this
 data they are close to opposed.
+
+
+## The claim that did not survive, and the one that did
+
+The obvious attack on the table above is corpus size. With only 12,353
+documents, a verbose query that matches many terms can still surface the right
+document in the top ten because there is little competition. On a realistic
+collection it should pull in far more noise.
+
+That attack is correct, so it is worth running rather than acknowledging. Adding
+answers from the training split as distractors, holding the queries fixed:
+
+| corpus | concat_4 recall | gold recall | concat_4 advantage |
+|---|---|---|---|
+| 12,353 | 0.737 | 0.715 | **+0.022** |
+| 24,353 | 0.683 | 0.667 | +0.016 |
+| 52,353 | 0.599 | 0.599 | +0.000 |
+| 59,149 | 0.590 | 0.592 | **-0.002** |
+
+**Concatenation beating the human rewrite is an artifact of a small corpus.** It
+decays to nothing by 52k documents and would be gone entirely on a real
+collection. Any claim resting on it should be discarded.
+
+The correlation is a different matter:
+
+| corpus | tau, ROUGE vs recall@10 | p |
+|---|---|---|
+| 12,353 | -0.867 | 0.017 |
+| 24,353 | -0.867 | 0.017 |
+| 52,353 | -0.733 | 0.056 |
+| 59,149 | -0.733 | 0.056 |
+
+Across a fivefold increase in collection size the anti-correlation is stable in
+direction and magnitude. What changes is which system sits at the top, not
+whether ROUGE orders them backwards. With six systems the p-value is marginal at
+the larger sizes, and it should be read as such.
 
 ## The part that nearly fooled me
 
@@ -124,3 +161,22 @@ Also in this repo: a hand-written sharded BM25 index and the measurement of what
 sharding does to correctness and latency (`results/idf_sharding.md`,
 `results/scaling.md`), and an experiment-design analysis of how much traffic it
 takes to detect these differences online (`results/experiment_design.md`).
+
+## What this is not
+
+The retrieval task is constructed, not the official QReCC benchmark: 12k to 59k
+short answers rather than 54M passages. The correlation held across the range
+tested, but 59k is still two to three orders of magnitude below a production
+collection, and nothing here establishes what happens there.
+
+BM25 only. A dense retriever may behave differently, and most modern systems use
+one. The choice was deliberate, since a dense encoder would fold its own
+semantics into the result, but it does limit what the finding covers.
+
+Six to seven distinct systems is a small sample for a rank correlation. The
+p-values are 0.017 to 0.056 and should be read as suggestive rather than
+settled.
+
+Metric validity in query rewriting is not a new concern in the IR literature.
+What this offers is a controlled measurement of it on one dataset, with the
+confounds tested rather than assumed.
