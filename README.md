@@ -233,3 +233,7 @@ settled.
 Metric validity in query rewriting is not a new concern in the IR literature.
 What this offers is a controlled measurement of it on one dataset, with the
 confounds tested rather than assumed.
+
+## License
+
+Code released under the MIT License (see `LICENSE`).
